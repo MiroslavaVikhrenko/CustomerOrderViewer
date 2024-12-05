@@ -1,6 +1,8 @@
 ﻿using CustomerOrderViewer.Models;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +27,33 @@ namespace CustomerOrderViewer.Repository
             //'List' is a concreate version, 'IList' is an abstract version => best practice 
             List<CustomerOrderDetailModel> customerOrderDetailModels = new List<CustomerOrderDetailModel>();
             //so far it's an empty list
+
+            //we initialize the connection in 'using' => the connection will be disposed after we're done using it => otherwise we would be spending resources
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open(); //now we have an open connection =>
+                                   //now we know which instance of SQL Server we're connected to
+                                   //and we also opened up that connection
+
+                //next we need to send commands => once again we need to use 'using' statement
+                using (SqlCommand command = new SqlCommand("SELECT CustomerOrderId, CustomerId, ItemId, FirstName, LastName, [Description], Price FROM CustomerOrderDetail", connection))
+                {
+                    //instantiate the SQL data reader => once again we use 'using' statement - ExecuteReader() method is going to grab the data from command above,
+                    //send it over 'connection' and get back to SQL data reader
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.HasRows) //HasRows is a property on the reader => if there are rows then go ahead and read them
+                        {
+                            while (reader.Read()) //while a reader can read (which is how this method works) - it will read the next row and will stop when there are no records
+                            {
+                                //now we have access to the reader
+                                string firstname = reader["FirstName"].ToString(); //here we are reading the first name from the returned row
+
+                            }
+                        }
+                    }
+                }
+            }
             return customerOrderDetailModels;
         }
     }
