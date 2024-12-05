@@ -47,7 +47,21 @@ namespace CustomerOrderViewer.Repository
                             while (reader.Read()) //while a reader can read (which is how this method works) - it will read the next row and will stop when there are no records
                             {
                                 //now we have access to the reader
-                                string firstname = reader["FirstName"].ToString(); //here we are reading the first name from the returned row
+
+                                //create CustomerOrderDetailModel => within this model we're going to put all of the properties that it already has
+                                CustomerOrderDetailModel customerOrderDetailModel = new CustomerOrderDetailModel()
+                                {
+                                    CustomerOrderId = Convert.ToInt32(reader["CustomerOrderId"]),
+                                    CustomerId = Convert.ToInt32(reader["CustomerId"]),
+                                    ItemId = Convert.ToInt32(reader["ItemId"]),
+                                    FirstName = reader["FirstName"].ToString(),
+                                    LastName = reader["LastName"].ToString(),
+                                    Description = reader["Description"].ToString(),
+                                    Price = Convert.ToDecimal(reader["Price"])
+
+                                };
+                                //adding to the list
+                                customerOrderDetailModels.Add(customerOrderDetailModel);
 
                             }
                         }
